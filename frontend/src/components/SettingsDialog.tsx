@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FaCog } from "react-icons/fa";
-import { Settings } from "../types";
+import { EditorTheme, Settings } from "../types";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -21,7 +21,7 @@ interface Props {
 }
 
 function SettingsDialog({ settings, setSettings }: Props) {
-  const handleThemeChange = (theme: string) => {
+  const handleThemeChange = (theme: EditorTheme) => {
     setSettings((s) => ({
       ...s,
       editorTheme: theme,
@@ -77,7 +77,10 @@ function SettingsDialog({ settings, setSettings }: Props) {
           />
 
           <Label htmlFor="screenshot-one-api-key">
-            <div>ScreenshotOne API key</div>
+            <div>
+              ScreenshotOne API key (optional - only needed if you want to use
+              URLs directly instead of taking the screenshot yourself)
+            </div>
             <div className="font-light mt-2 leading-relaxed">
               Only stored in your browser. Never stored on servers.{" "}
               <a
@@ -110,7 +113,7 @@ function SettingsDialog({ settings, setSettings }: Props) {
               id="editor-theme"
               value={settings.editorTheme}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                handleThemeChange(e.target.value)
+                handleThemeChange(e.target.value as EditorTheme)
               }
             >
               <option value="cobalt">Cobalt</option>

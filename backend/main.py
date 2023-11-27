@@ -33,7 +33,8 @@ app.add_middleware(
 
 # Useful for debugging purposes when you don't want to waste GPT4-Vision credits
 # Setting to True will stream a mock response instead of calling the OpenAI API
-SHOULD_MOCK_AI_RESPONSE = False
+# TODO: Should only be set to true when value is 'True', not any abitrary truthy value
+SHOULD_MOCK_AI_RESPONSE = bool(os.environ.get("MOCK", False))
 
 
 app.include_router(screenshot.router)
@@ -59,7 +60,7 @@ def write_logs(prompt_messages, completion):
 
 
 @app.websocket("/generate-code")
-async def stream_code_test(websocket: WebSocket):
+async def stream_code(websocket: WebSocket):
     await websocket.accept()
 
     params = await websocket.receive_json()
@@ -96,7 +97,10 @@ async def stream_code_test(websocket: WebSocket):
     async def process_chunk(content):
         await websocket.send_json({"type": "chunk", "value": content})
 
-    prompt_messages = assemble_prompt(params["image"])
+    if params.get("resultImage") and params["resultImage"]:
+        prompt_messages = assemble_prompt(params["image"], params["resultImage"])
+    else:
+        prompt_messages = assemble_prompt(params["image"])
 
     # Image cache for updates so that we don't have to regenerate images
     image_cache = {}
